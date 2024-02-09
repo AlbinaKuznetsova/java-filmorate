@@ -15,7 +15,7 @@ import java.util.HashMap;
 @RestController
 public class FilmController {
     private HashMap<Integer, Film> films = new HashMap<>();
-    private final static Logger log = LoggerFactory.getLogger(FilmController.class);
+    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private static Integer count = 0;
 
     @PostMapping("/films")
@@ -70,6 +70,7 @@ public class FilmController {
         }
         return film;
     }
+
     private Integer generateId() {
         return ++count;
     }

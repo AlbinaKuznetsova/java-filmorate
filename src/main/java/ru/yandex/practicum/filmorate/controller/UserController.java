@@ -14,7 +14,7 @@ import java.util.HashMap;
 @RestController
 public class UserController {
     private HashMap<Integer, User> users = new HashMap<Integer, User>();
-    private final static Logger log = LoggerFactory.getLogger(UserController.class);
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private static Integer count = 0;
 
     @PostMapping("/users")
