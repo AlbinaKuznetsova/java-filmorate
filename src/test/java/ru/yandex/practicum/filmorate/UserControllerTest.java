@@ -15,18 +15,20 @@ import java.time.LocalDate;
 @SpringBootTest
 public class UserControllerTest {
     UserController controller;
+
     @BeforeEach
     void beforeEach() {
         controller = new UserController();
     }
+
     @Test
     void createUserWrongLogin() {
         User user = new User();
         user.setLogin("test login");
         user.setEmail("test@yandex.ru");
-        user.setBirthday(LocalDate.of(1991,12,1));
+        user.setBirthday(LocalDate.of(1991, 12, 1));
         user.setName("test");
-        assertThrows(ValidationException.class,() -> controller.create(user));
+        assertThrows(ValidationException.class, () -> controller.create(user));
     }
 
     @Test
@@ -34,9 +36,9 @@ public class UserControllerTest {
         User user = new User();
         user.setLogin("testlogin");
         user.setEmail("testyandex.ru");
-        user.setBirthday(LocalDate.of(1991,12,1));
+        user.setBirthday(LocalDate.of(1991, 12, 1));
         user.setName("test");
-        assertThrows(ValidationException.class,() -> controller.create(user));
+        assertThrows(ValidationException.class, () -> controller.create(user));
     }
 
     @Test
@@ -44,9 +46,9 @@ public class UserControllerTest {
         User user = new User();
         user.setLogin("testlogin");
         user.setEmail("test@yandex.ru");
-        user.setBirthday(LocalDate.of(2026,12,1));
+        user.setBirthday(LocalDate.of(2026, 12, 1));
         user.setName("test");
-        assertThrows(ValidationException.class,() -> controller.create(user));
+        assertThrows(ValidationException.class, () -> controller.create(user));
     }
 
     @Test
@@ -54,11 +56,11 @@ public class UserControllerTest {
         User user = new User();
         user.setLogin("testlogin");
         user.setEmail("test@yandex.ru");
-        user.setBirthday(LocalDate.of(2000,12,1));
+        user.setBirthday(LocalDate.of(2000, 12, 1));
         try {
             controller.create(user);
             User user2 = controller.getUsers().stream().findFirst().get();
-            assertEquals(user2.getLogin(),user2.getName());
+            assertEquals(user2.getLogin(), user2.getName());
         } catch (ValidationException exp) {
             System.out.println(exp.getMessage());
         }

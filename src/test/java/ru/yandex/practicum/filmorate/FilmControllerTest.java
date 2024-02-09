@@ -14,19 +14,22 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 public class FilmControllerTest {
     FilmController controller;
+
     @BeforeEach
     void beforeEach() {
         controller = new FilmController();
     }
+
     @Test
     void createFilmWrongName() {
         Film film = new Film();
         film.setName("");
         film.setDescription("test");
         film.setDuration(100);
-        film.setReleaseDate(LocalDate.of(2000,1,1));
-        assertThrows(ValidationException.class, ()-> controller.create(film));
+        film.setReleaseDate(LocalDate.of(2000, 1, 1));
+        assertThrows(ValidationException.class, () -> controller.create(film));
     }
+
     @Test
     void createFilmWrongDescription() {
         Film film = new Film();
@@ -41,25 +44,27 @@ public class FilmControllerTest {
                 "        assertThrows(ValidationException.class, ()-> controller.create(film));\n" +
                 "    }");
         film.setDuration(100);
-        film.setReleaseDate(LocalDate.of(2000,1,1));
-        assertThrows(ValidationException.class, ()-> controller.create(film));
+        film.setReleaseDate(LocalDate.of(2000, 1, 1));
+        assertThrows(ValidationException.class, () -> controller.create(film));
     }
+
     @Test
     void createFilmWrongDate() {
         Film film = new Film();
         film.setName("test");
         film.setDescription("test");
         film.setDuration(100);
-        film.setReleaseDate(LocalDate.of(1800,1,1));
-        assertThrows(ValidationException.class, ()-> controller.create(film));
+        film.setReleaseDate(LocalDate.of(1800, 1, 1));
+        assertThrows(ValidationException.class, () -> controller.create(film));
     }
+
     @Test
     void createFilmWrongDuration() {
         Film film = new Film();
         film.setName("test");
         film.setDescription("test");
         film.setDuration(-100);
-        film.setReleaseDate(LocalDate.of(2000,1,1));
-        assertThrows(ValidationException.class, ()-> controller.create(film));
+        film.setReleaseDate(LocalDate.of(2000, 1, 1));
+        assertThrows(ValidationException.class, () -> controller.create(film));
     }
 }
