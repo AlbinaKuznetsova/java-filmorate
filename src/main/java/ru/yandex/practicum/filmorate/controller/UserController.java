@@ -19,21 +19,7 @@ public class UserController {
 
     @PostMapping("/users")
     public User create(@Valid @RequestBody User user) throws ValidationException {
-        if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.warn("Неправильный email\n" + user);
-            throw new ValidationException("Неправильный email");
-        } else if (user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            log.warn("Неправильный логин\n" + user);
-            throw new ValidationException("Неправильный логин");
-        } else if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Неправильная дата рождения\n" + user);
-            throw new ValidationException("Неправильная дата рождения");
-        }
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        } else if (user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+        validateUser(user);
         if (user.getId() == null) {
             user.setId(generateId());
         }
@@ -49,6 +35,23 @@ public class UserController {
 
     @PutMapping("/users")
     public User update(@Valid @RequestBody User user) throws ValidationException {
+        validateUser(user);
+        if (users.containsKey(user.getId())) {
+            users.put(user.getId(), user);
+            log.info("Обновлен пользователь {}", user);
+        } else {
+            log.warn("Пользователя с id = {} не существует", user.getId());
+            throw new ValidationException("Пользователя с id = " + user.getId() + " не существует");
+        }
+
+        return user;
+    }
+
+    private Integer generateId() {
+        return ++count;
+    }
+
+    private void validateUser(User user) throws ValidationException {
         if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.warn("Неправильный email\n" + user);
             throw new ValidationException("Неправильный email");
@@ -64,18 +67,5 @@ public class UserController {
         } else if (user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.info("Обновлен пользователь {}", user);
-        } else {
-            log.warn("Пользователя с id = {} не существует", user.getId());
-            throw new ValidationException("Пользователя с id = " + user.getId() + " не существует");
-        }
-
-        return user;
-    }
-
-    private Integer generateId() {
-        return ++count;
     }
 }

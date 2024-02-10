@@ -20,19 +20,7 @@ public class FilmController {
 
     @PostMapping("/films")
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
-        if (film.getName().isBlank()) {
-            log.warn("Название не может быть пустым\n" + film);
-            throw new ValidationException("Название не может быть пустым");
-        } else if (film.getDescription().length() > 200) {
-            log.warn("Описание слишком длинное\n" + film);
-            throw new ValidationException("Описание слишком длинное");
-        } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
-            log.warn("Фильм слишком старый\n" + film);
-            throw new ValidationException("Фильм слишком старый");
-        } else if (film.getDuration() <= 0) {
-            log.warn("Продолжительность фильма должна быть положительной\n" + film);
-            throw new ValidationException("Продолжительность фильма должна быть положительной");
-        }
+        validateFilm(film);
         if (film.getId() == null) {
             film.setId(generateId());
         }
@@ -48,6 +36,22 @@ public class FilmController {
 
     @PutMapping("/films")
     public Film update(@Valid @RequestBody Film film) throws ValidationException {
+        validateFilm(film);
+        if (films.containsKey(film.getId())) {
+            films.put(film.getId(), film);
+            log.info("Обновлен фильм {}", film);
+        } else {
+            log.warn("Фильма с id = {} не существует", film.getId());
+            throw new ValidationException("Фильма с id = " + film.getId() + " не существует");
+        }
+        return film;
+    }
+
+    private Integer generateId() {
+        return ++count;
+    }
+
+    private void validateFilm(Film film) throws ValidationException {
         if (film.getName().isBlank()) {
             log.warn("Название не может быть пустым\n" + film);
             throw new ValidationException("Название не может быть пустым");
@@ -61,17 +65,5 @@ public class FilmController {
             log.warn("Продолжительность фильма должна быть положительной\n" + film);
             throw new ValidationException("Продолжительность фильма должна быть положительной");
         }
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-            log.info("Обновлен фильм {}", film);
-        } else {
-            log.warn("Фильма с id = {} не существует", film.getId());
-            throw new ValidationException("Фильма с id = " + film.getId() + " не существует");
-        }
-        return film;
-    }
-
-    private Integer generateId() {
-        return ++count;
     }
 }
