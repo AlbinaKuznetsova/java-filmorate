@@ -2,20 +2,19 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.Past;
 import java.time.LocalDate;
 
-/**
- * Film.
- */
 @Data
-public class Film {
+public class User {
     private Integer id;
+    @Email
+    private String email;
     @NotBlank
+    private String login;
     private String name;
-    private String description;
-    private LocalDate releaseDate;
-    @Positive
-    private Integer duration;
+    @Past
+    private LocalDate birthday;
 }
