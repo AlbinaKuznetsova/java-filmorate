@@ -11,22 +11,23 @@ import ru.yandex.practicum.filmorate.model.ValidationException;
 public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(ObjectNotFoundException e){
+    public ErrorResponse handleNotFoundException(ObjectNotFoundException e) {
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadRequest(ValidationException e){
+    public ErrorResponse handleBadRequest(ValidationException e) {
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleInternalServerError(Throwable e){
+    public ErrorResponse handleInternalServerError(Throwable e) {
         return new ErrorResponse(e.getMessage());
     }
 }
+
 class ErrorResponse {
     private final String error;
 
