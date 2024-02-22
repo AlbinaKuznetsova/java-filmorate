@@ -1,45 +1,38 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.ValidationException;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class UserController {
-    private UserStorage userStorage;
-    private UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-        this.userStorage = userService.getUserStorage();
-    }
+    private final UserService userService;
 
     @PostMapping("/users")
     public User create(@Valid @RequestBody User user) throws ValidationException {
-        return userStorage.createUser(user);
+        return userService.getUserStorage().createUser(user);
     }
 
     @GetMapping("/users")
     public Collection<User> getUsers() {
-        return userStorage.getUsers();
+        return userService.getUserStorage().getUsers();
     }
 
     @PutMapping("/users")
     public User update(@Valid @RequestBody User user) throws ValidationException {
-        return userStorage.updateUser(user);
+        return userService.getUserStorage().updateUser(user);
     }
 
     @GetMapping("/users/{id}")
     public User getUser(@PathVariable Integer id) {
-        return userStorage.getUserById(id);
+        return userService.getUserStorage().getUserById(id);
     }
 
     @PutMapping("/users/{id}/friends/{friendId}")
