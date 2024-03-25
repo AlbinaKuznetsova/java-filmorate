@@ -40,8 +40,8 @@ public class FilmDbStorage implements FilmStorage {
         }
         String sql = "INSERT INTO FILMS (FILMID, NAME, DESCRIPTION, RELEASEDATE, DURATION, RATINGMPAID)\n" +
                 "VALUES(?, ?, ?, ?, ?, ?);";
-        jdbcTemplate.update(sql, film.getId(), film.getName(), film.getDescription(), film.getReleaseDate()
-                , film.getDuration(), film.getMpa().getId());
+        jdbcTemplate.update(sql, film.getId(), film.getName(), film.getDescription(), film.getReleaseDate(),
+                film.getDuration(), film.getMpa().getId());
         Genre[] genres = film.getGenres().toArray(Genre[]::new);
         for (int i = 0; i < genres.length; i++) {
             sql = "INSERT INTO FILMGENRE (FILMID, GENREID) VALUES(?, ?);";
