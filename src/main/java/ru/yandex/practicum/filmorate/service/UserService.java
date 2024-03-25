@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.dao.UserServiceDao;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -28,25 +27,17 @@ public class UserService {
     }
 
     public void deleteFriend(Integer userId, Integer friendId) {
-        try {
-            User user1 = userStorage.getUserById(userId);
-            User user2 = userStorage.getUserById(friendId);
-            userServiceDao.deleteFriend(userId, friendId);
-        } catch (ObjectNotFoundException e) {
-            log.warn(e.getMessage());
-        }
+        User user1 = userStorage.getUserById(userId);
+        User user2 = userStorage.getUserById(friendId);
+        userServiceDao.deleteFriend(userId, friendId);
     }
 
     public List<User> getFriends(Integer id) {
         List<User> friendsList = new ArrayList<>();
-        try {
-            User user = userStorage.getUserById(id);
-            Map<Integer, Boolean> friends = user.getFriends();
-            for (Integer friend : friends.keySet()) {
-                friendsList.add(userStorage.getUserById(friend));
-            }
-        } catch (ObjectNotFoundException e) {
-            log.warn(e.getMessage());
+        User user = userStorage.getUserById(id);
+        Map<Integer, Boolean> friends = user.getFriends();
+        for (Integer friend : friends.keySet()) {
+            friendsList.add(userStorage.getUserById(friend));
         }
         return friendsList;
     }
