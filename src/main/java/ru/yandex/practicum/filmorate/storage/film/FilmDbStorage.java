@@ -17,10 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @Primary
@@ -42,10 +39,10 @@ public class FilmDbStorage implements FilmStorage {
                 "VALUES(?, ?, ?, ?, ?, ?);";
         jdbcTemplate.update(sql, film.getId(), film.getName(), film.getDescription(), film.getReleaseDate(),
                 film.getDuration(), film.getMpa().getId());
-        Genre[] genres = film.getGenres().toArray(Genre[]::new);
-        for (int i = 0; i < genres.length; i++) {
+        Iterator<Genre> it = film.getGenres().iterator();
+        while (it.hasNext()) {
             sql = "INSERT INTO FILMGENRE (FILMID, GENREID) VALUES(?, ?);";
-            jdbcTemplate.update(sql, film.getId(), genres[i].getId());
+            jdbcTemplate.update(sql, film.getId(), it.next().getId());
         }
         log.info("Создан фильм {}", film);
         return getFilmById(film.getId());
@@ -64,12 +61,12 @@ public class FilmDbStorage implements FilmStorage {
         getFilmById(film.getId());
         jdbcTemplate.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId());
 
-        Genre[] genres = film.getGenres().toArray(Genre[]::new);
+        Iterator<Genre> it = film.getGenres().iterator();
         sql = "DELETE FROM FILMGENRE WHERE FILMID = ?;";
         jdbcTemplate.update(sql, film.getId());
-        for (int i = 0; i < genres.length; i++) {
+        while (it.hasNext()) {
             sql = "INSERT INTO FILMGENRE (FILMID, GENREID) VALUES(?, ?);";
-            jdbcTemplate.update(sql, film.getId(), genres[i].getId());
+            jdbcTemplate.update(sql, film.getId(), it.next().getId());
         }
         log.info("Обновлен фильм {}", film);
         return getFilmById(film.getId());
