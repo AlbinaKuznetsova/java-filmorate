@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -48,5 +50,25 @@ public class FilmController {
     @GetMapping("/films/popular")
     public List<Film> getPopularFilms(@RequestParam(defaultValue = "10", required = false) Integer count) {
         return filmService.getPopular(count);
+    }
+
+    @GetMapping("/genres")
+    public Collection<Genre> getGenres() {
+        return filmService.getGenres();
+    }
+
+    @GetMapping("genres/{id}")
+    public Genre getGenreById(@PathVariable Integer id) {
+        return filmService.getGenreById(id);
+    }
+
+    @GetMapping("/mpa")
+    public Collection<RatingMPA> getMPA() {
+        return filmService.getMPA();
+    }
+
+    @GetMapping("mpa/{id}")
+    public RatingMPA getMPAById(@PathVariable Integer id) {
+        return filmService.getMPAById(id);
     }
 }
