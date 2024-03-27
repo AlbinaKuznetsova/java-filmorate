@@ -1,14 +1,17 @@
 package ru.yandex.practicum.filmorate;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.service.dao.UserServiceDao;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,14 +19,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 
-@SpringBootTest
+@JdbcTest // указываем, о необходимости подготовить бины для работы с БД
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserControllerTest {
+    private final JdbcTemplate jdbcTemplate;
     UserController controller;
     UserServiceDao userServiceDao;
 
     @BeforeEach
     void beforeEach() {
-        UserStorage userStorage = new InMemoryUserStorage();
+        UserStorage userStorage = new UserDbStorage(jdbcTemplate);
+        userServiceDao = new UserServiceDao(jdbcTemplate);
         UserService userService = new UserService(userStorage, userServiceDao);
         controller = new UserController(userService);
     }
@@ -73,7 +79,7 @@ public class UserControllerTest {
         }
     }
 
-    /*@Test
+    @Test
     void createAndDeleteFriend() {
         User user = new User();
         user.setLogin("testlogin");
@@ -88,7 +94,7 @@ public class UserControllerTest {
         assertEquals(2, controller.getUsers().size());
         controller.createFriend(user.getId(), user2.getId());
         assertTrue(controller.getFriends(user.getId()).contains(user2));
-        assertTrue(controller.getFriends(user2.getId()).contains(user));
+        assertFalse(controller.getFriends(user2.getId()).contains(user));
 
         User user3 = new User();
         user3.setLogin("test3login");
@@ -103,7 +109,6 @@ public class UserControllerTest {
 
         controller.deleteFriend(user.getId(), user2.getId());
         assertFalse(controller.getFriends(user.getId()).contains(user2));
-        assertFalse(controller.getFriends(user2.getId()).contains(user));
 
-    }*/
+    }
 }
