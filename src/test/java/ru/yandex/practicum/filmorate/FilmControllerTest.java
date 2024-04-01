@@ -1,34 +1,48 @@
 package ru.yandex.practicum.filmorate;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.ValidationException;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.dao.FilmServiceDao;
+import ru.yandex.practicum.filmorate.service.dao.UserServiceDao;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+
+@JdbcTest // указываем, о необходимости подготовить бины для работы с БД
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmControllerTest {
+    private final JdbcTemplate jdbcTemplate;
     FilmController controller;
     UserStorage userStorage;
+    FilmServiceDao filmServiceDao;
 
     @BeforeEach
     void beforeEach() {
-        FilmStorage filmStorage = new InMemoryFilmStorage();
-        userStorage = new InMemoryUserStorage();
-        FilmService filmService = new FilmService(filmStorage, userStorage);
+        FilmStorage filmStorage = new FilmDbStorage(jdbcTemplate);
+        userStorage = new UserDbStorage(jdbcTemplate);
+        filmServiceDao = new FilmServiceDao(jdbcTemplate);
+        FilmService filmService = new FilmService(filmStorage, userStorage, filmServiceDao);
         controller = new FilmController(filmService);
     }
 
@@ -82,7 +96,8 @@ public class FilmControllerTest {
 
     @Test
     void createLike() {
-        UserService userService = new UserService(userStorage);
+        UserServiceDao userServiceDao = new UserServiceDao(jdbcTemplate);
+        UserService userService = new UserService(userStorage, userServiceDao);
         UserController userController = new UserController(userService);
         User user = new User();
         user.setLogin("testlogin");
@@ -95,6 +110,8 @@ public class FilmControllerTest {
         film.setDescription("test");
         film.setDuration(100);
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
+        film.setMpa(new RatingMPA(1, "G"));
+        film.setGenres(new HashSet<>(List.of(new Genre(3, "Мультфильм"))));
         controller.create(film);
 
         Film film2 = new Film();
@@ -102,20 +119,18 @@ public class FilmControllerTest {
         film2.setDescription("test");
         film2.setDuration(100);
         film2.setReleaseDate(LocalDate.of(2000, 1, 1));
+        film2.setMpa(new RatingMPA(1, "G"));
+        film2.setGenres(new HashSet<>(List.of(new Genre(3, "Мультфильм"))));
         controller.create(film2);
 
         controller.createLike(film.getId(), user.getId());
         assertTrue(controller.getFilm(film.getId()).getLikes().contains(user.getId()));
 
+        film = controller.getFilm(film.getId());
         assertEquals(0, controller.getPopularFilms(10).indexOf(film));
 
         controller.deleteLike(film.getId(), user.getId());
         assertFalse(controller.getFilm(film.getId()).getLikes().contains(user.getId()));
-
-    }
-
-    @Test
-    void createLikeFromWrongUser() {
 
     }
 }
